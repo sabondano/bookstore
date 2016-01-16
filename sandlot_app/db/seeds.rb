@@ -5,3 +5,13 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+
+Publisher.create!(name: 'Simon & Schuster Inc')
+Publisher.create!(name: 'Pearson')
+
+Author.create!(first_name: 'Stephen', last_name: 'King')
+Author.create!(first_name: 'William', last_name: 'Shakespeare')
+
+BookFormatType.create!(name: 'Hardcover', physical: true)
+BookFormatType.create!(name: 'Softcover', physical: true)
+BookFormatType.create!(name: 'Kindle', physical: false)
