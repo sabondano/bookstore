@@ -26,18 +26,6 @@ class Book < ActiveRecord::Base
 
   private
 
-  def self.search_by_author_last_name(last_name)
-    Author.where("lower(last_name) = ?", last_name.downcase).flat_map(&:books)
-  end
-
-  def self.search_by_publisher_name(name)
-    Publisher.where("lower(name) = ?", name.downcase).flat_map(&:books)
-  end
-
-  def self.search_by_book_title(title)
-    books = Book.where("lower(title) like ?", "%#{title.downcase}%")
-  end
-
   def self.search_per_options(query, options)
     if options[:title_only]
       search_results = search_by_book_title(query)
@@ -66,6 +54,18 @@ class Book < ActiveRecord::Base
     search_results
   end
 
+  def self.search_by_author_last_name(last_name)
+    Author.where("lower(last_name) = ?", last_name.downcase).flat_map(&:books)
+  end
+
+  def self.search_by_publisher_name(name)
+    Publisher.where("lower(name) = ?", name.downcase).flat_map(&:books)
+  end
+
+  def self.search_by_book_title(title)
+    books = Book.where("lower(title) like ?", "%#{title.downcase}%")
+  end
+
   def self.filter_by_book_format_type_id(search_results, book_format_type_id)
     search_results.select do |book|
       book.book_format_types.map(&:id)
@@ -74,7 +74,7 @@ class Book < ActiveRecord::Base
   end
 
   def self.filter_by_book_format_physical(search_results, book_format_physical)
-    search_results.select! do |book|
+    search_results.select do |book|
       book.book_format_types.map(&:physical)
         .include?(book_format_physical)
     end
