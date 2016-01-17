@@ -87,4 +87,20 @@ describe Book do
       expect(book.author_name).to eq("Shakespeare, William")
     end
   end
+
+  describe "#average_rating" do
+    it "returns the average (mean) of all the book reviews for this book (rounded to one decimal place)" do
+      book = Book.create(
+        title: "Romeo and Juliet",
+        publisher_id: @publisher.id,
+        author_id: @author.id
+      )
+
+      book.book_reviews.create(rating: 3)
+      book.book_reviews.create(rating: 5)
+      book.book_reviews.create(rating: 4)
+
+      expect(book.average_rating).to eq(4.0)
+    end
+  end
 end

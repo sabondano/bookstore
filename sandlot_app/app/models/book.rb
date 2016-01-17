@@ -10,4 +10,8 @@ class Book < ActiveRecord::Base
   def author_name
     "#{author.last_name}, #{author.first_name}"
   end
+
+  def average_rating
+    book_reviews.average("rating")
+  end
 end
