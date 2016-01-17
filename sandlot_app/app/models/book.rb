@@ -14,4 +14,24 @@ class Book < ActiveRecord::Base
   def average_rating
     book_reviews.average("rating")
   end
+
+  def self.search(query)
+    search_by_author_last_name(query) |
+      search_by_publisher_name(query) |
+      search_by_book_title(query)
+  end
+
+  private
+
+  def self.search_by_author_last_name(last_name)
+    Author.where("lower(last_name) = ?", last_name.downcase).flat_map(&:books)
+  end
+
+  def self.search_by_publisher_name(name)
+    Publisher.where("lower(name) = ?", name.downcase).flat_map(&:books)
+  end
+
+  def self.search_by_book_title(title)
+    books = Book.where("lower(title) like ?", "%#{title.downcase}%")
+  end
 end

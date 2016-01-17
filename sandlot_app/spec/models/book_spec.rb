@@ -3,7 +3,9 @@ require 'rails_helper'
 describe Book do
   before do
     @publisher = Publisher.create!(name: 'Pearson')
+    @publisher_2 = Publisher.create!(name: 'Simon & Schuster Inc')
     @author = Author.create!(first_name: 'William', last_name: 'Shakespeare')
+    @author_2 = Author.create!(first_name: 'Stephen', last_name: 'King')
 
     @hardcover_format = BookFormatType.create!(name: 'Hardcover', physical: true)
     @softcover_format = BookFormatType.create!(name: 'Softcover', physical: true)
@@ -101,6 +103,83 @@ describe Book do
       book.book_reviews.create(rating: 4)
 
       expect(book.average_rating).to eq(4.0)
+    end
+  end
+
+  describe "#search(query, options)" do
+    context "if the last name of the author matches the query string exactly (case insensitive)" do
+      it "returns a collection of books that match the query string" do
+        book_1 = Book.create(
+          title: "Romeo and Juliet",
+          publisher_id: @publisher.id,
+          author_id: @author.id
+        )
+
+        book_2 = Book.create(
+          title: "Something Else",
+          publisher_id: @publisher.id,
+          author_id: @author_2.id
+        )
+
+        search_results = Book.search("king")
+
+        expect(search_results.count).to eq(1)
+        expect(search_results.first.title).to eq("Something Else")
+      end
+    end
+
+    context "if the name of the publisher matches the query string exactly (case insensitive)" do
+      it "returns a collection of books that match the query string" do
+        book_1 = Book.create(
+          title: "Romeo and Juliet",
+          publisher_id: @publisher.id,
+          author_id: @author.id
+        )
+
+        book_2 = Book.create(
+          title: "Something Else",
+          publisher_id: @publisher.id,
+          author_id: @author_2.id
+        )
+
+        book_3 = Book.create(
+          title: "Terakeeting",
+          publisher_id: @publisher_2.id,
+          author_id: @author.id
+        )
+
+        search_results = Book.search("pearson")
+
+        expect(search_results.count).to eq(2)
+        expect(search_results.first.title).to eq("Romeo and Juliet")
+      end
+    end
+
+    context "if any portion of the book's title matches the query string (case insensitive)" do
+      it "returns a collection of books that match the query string" do
+        book_1 = Book.create(
+          title: "Romeo and Juliet",
+          publisher_id: @publisher.id,
+          author_id: @author.id
+        )
+
+        book_2 = Book.create(
+          title: "Something Else",
+          publisher_id: @publisher.id,
+          author_id: @author_2.id
+        )
+
+        book_3 = Book.create(
+          title: "Terakeeting",
+          publisher_id: @publisher_2.id,
+          author_id: @author.id
+        )
+
+        search_results = Book.search("juliet")
+
+        expect(search_results.count).to eq(1)
+        expect(search_results.first.title).to eq("Romeo and Juliet")
+      end 
     end
   end
 end
