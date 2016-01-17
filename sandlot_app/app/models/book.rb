@@ -16,15 +16,23 @@ class Book < ActiveRecord::Base
   end
 
   def self.search(query, options = {})
-    options = { title_only: false }.merge(options)
+    options = { title_only: false,
+                book_format_type_id: nil }.merge(options)
 
-    case options
-    when { title_only: true }
+    if options[:title_only]
       search_results = search_by_book_title(query)
-    when { title_only: false }
+    end
+
+    unless options[:title_only]
       search_results = search_by_author_last_name(query) |
         search_by_publisher_name(query) |
         search_by_book_title(query)
+    end
+
+    if book_format_type_id = options[:book_format_type_id]
+      search_results.select! do |book|
+        book.book_format_types.map(&:id).include?(book_format_type_id)
+      end
     end
 
     search_results.sort_by(&:average_rating).reverse

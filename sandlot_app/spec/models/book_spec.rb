@@ -53,7 +53,7 @@ describe Book do
   end
 
   describe "#book_format_types" do
-    it "returns a collection of the BookFormatTypes this book is available in" do
+    it "returns a collection of the BookFormatTypes the book is available in" do
       book = Book.create(
         title: "Romeo and Juliet",
         publisher_id: @publisher.id,
@@ -79,7 +79,8 @@ describe Book do
   end
 
   describe "#author_name" do
-    it "returns the name of the author of this book in 'lastname, firstname' format" do
+    it "returns the name of the author of this book in
+        'lastname, firstname' format" do
       book = Book.create(
         title: "Romeo and Juliet",
         publisher_id: @publisher.id,
@@ -91,7 +92,8 @@ describe Book do
   end
 
   describe "#average_rating" do
-    it "returns the average (mean) of all the book reviews for this book (rounded to one decimal place)" do
+    it "returns the average (mean) of all the book reviews for this book
+        (rounded to one decimal place)" do
       book = Book.create(
         title: "Romeo and Juliet",
         publisher_id: @publisher.id,
@@ -107,7 +109,7 @@ describe Book do
   end
 
   describe "#search(query, options)" do
-    context "if the last name of the author matches the query string exactly (case insensitive)" do
+    context "if the last name of the author matches the query string exactly" do
       it "returns a collection of books that match the query string" do
         book_1 = Book.create(
           title: "Romeo and Juliet",
@@ -128,7 +130,7 @@ describe Book do
       end
     end
 
-    context "if the name of the publisher matches the query string exactly (case insensitive)" do
+    context "if the name of the publisher matches the query string exactly" do
       it "returns a collection of books that match the query string" do
         book_1 = Book.create(
           title: "Romeo and Juliet",
@@ -156,7 +158,7 @@ describe Book do
       end
     end
 
-    context "if any portion of the book's title matches the query string (case insensitive)" do
+    context "if any portion of the book's title matches the query string" do
       it "returns a collection of books that match the query string" do
         book_1 = Book.create(
           title: "Romeo and Juliet",
@@ -183,7 +185,7 @@ describe Book do
       end 
     end
 
-    context "the results should be ordered by average rating, with the highest rating first" do
+    context "the results should be ordered by average rating (highest first)" do
       it "returns a collection of books that match the query string" do
         book_1 = Book.create(
           title: "Romeo and Juliet",
@@ -214,8 +216,8 @@ describe Book do
       end
     end
 
-    context "if :title_only option is true, only return results from searching by book title" do
-      it "returns a collection of books that match the query string" do
+    context "if :title_only option is true" do
+      it "returns a collection of books searching only by book title" do
         book_1 = Book.create(
           title: "The Pearson Book",
           publisher_id: @publisher.id,
@@ -232,6 +234,32 @@ describe Book do
 
         expect(search_results.count).to eq(1)
         expect(search_results.first.title).to eq("The Pearson Book")
+      end
+    end
+
+    context "if :book_format_type_id is given" do
+      it "returns a collection of books that are available in matching format" do
+        book_1 = Book.create(
+          title: "Romeo and Juliet",
+          publisher_id: @publisher.id,
+          author_id: @author.id
+        )
+
+        BookFormat.create(
+          book_id: book_1.id,
+          book_format_type_id: @hardcover_format.id
+        )
+
+        book_2 = Book.create(
+          title: "The Pearson Book",
+          publisher_id: @publisher.id,
+          author_id: @author.id
+        )
+
+        search_results = Book.search("pearson", book_format_type_id: @hardcover_format.id)
+
+        expect(search_results.count).to eq(1)
+        expect(search_results.first.title).to eq("Romeo and Juliet")
       end
     end
   end
