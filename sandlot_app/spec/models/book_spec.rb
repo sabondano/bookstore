@@ -151,7 +151,8 @@ describe Book do
         search_results = Book.search("pearson")
 
         expect(search_results.count).to eq(2)
-        expect(search_results.first.title).to eq("Romeo and Juliet")
+        expect(search_results.first.title).to eq("Something Else")
+        expect(search_results.last.title).to eq("Romeo and Juliet")
       end
     end
 
@@ -180,6 +181,37 @@ describe Book do
         expect(search_results.count).to eq(1)
         expect(search_results.first.title).to eq("Romeo and Juliet")
       end 
+    end
+
+    context "the results should be ordered by average rating, with the highest rating first" do
+      it "returns a collection of books that match the query string" do
+        book_1 = Book.create(
+          title: "Romeo and Juliet",
+          publisher_id: @publisher.id,
+          author_id: @author.id
+        )
+
+        book_2 = Book.create(
+          title: "Something Else",
+          publisher_id: @publisher.id,
+          author_id: @author_2.id
+        )
+
+        book_3 = Book.create(
+          title: "Terakeeting",
+          publisher_id: @publisher.id,
+          author_id: @author.id
+        )
+
+        book_1.book_reviews.create(rating: 2)
+        book_2.book_reviews.create(rating: 4)
+        book_3.book_reviews.create(rating: 3)
+
+        search_results = Book.search("pearson")
+
+        expect(search_results.first.title).to eq("Something Else")
+        expect(search_results.last.title).to eq("Romeo and Juliet")
+      end
     end
   end
 end

@@ -16,9 +16,11 @@ class Book < ActiveRecord::Base
   end
 
   def self.search(query)
-    search_by_author_last_name(query) |
+    search_results = search_by_author_last_name(query) |
       search_by_publisher_name(query) |
       search_by_book_title(query)
+
+    search_results.sort_by(&:average_rating).reverse
   end
 
   private
