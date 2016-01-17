@@ -15,10 +15,17 @@ class Book < ActiveRecord::Base
     book_reviews.average("rating")
   end
 
-  def self.search(query)
-    search_results = search_by_author_last_name(query) |
-      search_by_publisher_name(query) |
-      search_by_book_title(query)
+  def self.search(query, options = {})
+    options = { title_only: false }.merge(options)
+
+    case options
+    when { title_only: true }
+      search_results = search_by_book_title(query)
+    when { title_only: false }
+      search_results = search_by_author_last_name(query) |
+        search_by_publisher_name(query) |
+        search_by_book_title(query)
+    end
 
     search_results.sort_by(&:average_rating).reverse
   end

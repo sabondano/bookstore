@@ -213,5 +213,26 @@ describe Book do
         expect(search_results.last.title).to eq("Romeo and Juliet")
       end
     end
+
+    context "if :title_only option is true, only return results from searching by book title" do
+      it "returns a collection of books that match the query string" do
+        book_1 = Book.create(
+          title: "The Pearson Book",
+          publisher_id: @publisher.id,
+          author_id: @author.id
+        )
+
+        book_2 = Book.create(
+          title: "Romeo and Juliet",
+          publisher_id: @publisher.id,
+          author_id: @author.id
+        )
+
+        search_results = Book.search("pearson", title_only: true)
+
+        expect(search_results.count).to eq(1)
+        expect(search_results.first.title).to eq("The Pearson Book")
+      end
+    end
   end
 end
