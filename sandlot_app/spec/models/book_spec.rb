@@ -256,10 +256,61 @@ describe Book do
           author_id: @author.id
         )
 
-        search_results = Book.search("pearson", book_format_type_id: @hardcover_format.id)
+        book_3 = Book.create(
+          title: "Terakeeting",
+          publisher_id: @publisher.id,
+          author_id: @author.id
+        )
 
-        expect(search_results.count).to eq(1)
-        expect(search_results.first.title).to eq("Romeo and Juliet")
+        search_results_1 = Book.search("pearson", book_format_type_id: @hardcover_format.id)
+        search_results_2 = Book.search("pearson")
+
+        expect(search_results_1.count).to eq(1)
+        expect(search_results_1.first.title).to eq("Romeo and Juliet")
+        expect(search_results_2.count).to eq(3)
+      end
+    end
+
+    context "if :book_format_physical is given" do
+      it "only returns books that are available in a format whose
+          'physical' field matched the supplied argument" do
+        book_1 = Book.create(
+          title: "Romeo and Juliet",
+          publisher_id: @publisher.id,
+          author_id: @author.id
+        )
+
+        BookFormat.create(
+          book_id: book_1.id,
+          book_format_type_id: @hardcover_format.id
+        )
+
+        book_2 = Book.create(
+          title: "The Pearson Book",
+          publisher_id: @publisher.id,
+          author_id: @author.id
+        )
+
+        book_3 = Book.create(
+          title: "Terakeeting",
+          publisher_id: @publisher.id,
+          author_id: @author.id
+        )
+
+        BookFormat.create(
+          book_id: book_3.id,
+          book_format_type_id: @kindle_format.id
+        )
+
+        search_results_1 = Book.search("pearson", book_format_physical: true)
+        search_results_2 = Book.search("pearson", book_format_physical: false)
+        search_results_3 = Book.search("pearson")
+
+        expect(search_results_1.count).to eq(1)
+        expect(search_results_1.first.title).to eq("Romeo and Juliet")
+        expect(search_results_2.count).to eq(1)
+        expect(search_results_2.first.title).to eq("Terakeeting")
+        expect(search_results_3.count).to eq(3)
       end
     end
   end
